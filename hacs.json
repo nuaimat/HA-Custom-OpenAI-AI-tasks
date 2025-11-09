@@ -1,8 +1,8 @@
 {
-  "name": "Azure AI Tasks",
+  "name": "Custom OpenAI AI Tasks",
   "content_in_root": false,
   "zip_release": true,
-  "filename": "azure_ai_tasks.zip",
+  "filename": "custom_openai_ai_tasks.zip",
   "hide_default_branch": false,
   "homeassistant": "2025.10.0"
 }

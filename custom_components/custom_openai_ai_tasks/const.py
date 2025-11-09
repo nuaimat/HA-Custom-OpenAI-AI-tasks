@@ -1,6 +1,6 @@
-"""Constants for the Azure AI Tasks integration."""
+"""Constants for the Custom OpenAI AI Tasks integration."""
 
-DOMAIN = "azure_ai_tasks"
+DOMAIN = "custom_openai_ai_tasks"
 
 # Configuration keys
 CONF_ENDPOINT = "endpoint"
@@ -9,7 +9,7 @@ CONF_CHAT_MODEL = "chat_model"
 CONF_IMAGE_MODEL = "image_model"
 
 # Default values
-DEFAULT_NAME = "Azure AI Tasks"
+DEFAULT_NAME = "Custom OpenAI AI Tasks"
 DEFAULT_CHAT_MODEL = "gpt-4o"
 DEFAULT_IMAGE_MODEL = "dall-e-3"
 
@@ -19,7 +19,11 @@ CHAT_MODELS = [
     "gpt-4-32k", 
     "gpt-4-turbo",
     "gpt-4o",
-    "gpt-4o-mini"
+    "gpt-4o-mini",
+    "Granite-4.0-h-tiny",
+    "gpt-5",
+    "gpt-5o",
+    "gpt-5o-mini",
 ]
 
 # Available image generation models

@@ -1,4 +1,4 @@
-"""Config flow for Azure AI Tasks integration."""
+"""Config flow for Custom OpenAI AI Tasks integration."""
 from __future__ import annotations
 
 import logging
@@ -41,7 +41,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Azure AI Tasks."""
+    """Handle a config flow for Custom OpenAI AI Tasks."""
 
     VERSION = 2  # Increment version to trigger migration
     
@@ -60,7 +60,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         
         # Create new entry with migrated data
         return self.async_create_entry(
-            title=import_data.get("name", "Azure AI Tasks"),
+            title=import_data.get("name", "Custom OpenAI AI Tasks"),
             data=import_data
         )
 
@@ -107,13 +107,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if response.status == 401:
                 raise Exception("Invalid API key")
             elif response.status >= 400:
-                raise Exception("Cannot connect to Azure AI endpoint")
+                raise Exception("Cannot connect to Custom OpenAI AI endpoint")
         
         return True
 
 
 class OptionsFlowHandler(config_entries.OptionsFlow):
-    """Handle options flow for Azure AI Tasks."""
+    """Handle options flow for Custom OpenAI AI Tasks."""
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialize options flow."""

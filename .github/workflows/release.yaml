@@ -19,14 +19,14 @@ jobs:
 
       - name: Create zip file
         run: |
-          cd custom_components/azure_ai_tasks
-          zip -r ../../azure_ai_tasks.zip . -x "__pycache__/*" "*.pyc" "*.pyo"
+          cd custom_components/custom_openai_ai_tasks
+          zip -r ../../custom_openai_ai_tasks.zip . -x "__pycache__/*" "*.pyc" "*.pyo"
 
       - name: Upload zip to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./azure_ai_tasks.zip
-          asset_name: azure_ai_tasks.zip
+          file: ./custom_openai_ai_tasks.zip
+          asset_name: custom_openai_ai_tasks.zip
           tag: ${{ github.event.release.tag_name }}
           overwrite: true

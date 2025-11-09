@@ -1,0 +1,12 @@
+{
+  "domain": "custom_openai_ai_tasks",
+  "name": "Custom OpenAI AI Tasks",
+  "codeowners": ["@nuaimat"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/nuaimat/HA-Custom-OpenAI-AI-tasks",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/nuaimat/HA-Custom-OpenAI-AI-tasks/issues",
+  "requirements": ["aiohttp>=3.8.0", "packaging>=21.0"],
+  "version": "2.0.3"
+}

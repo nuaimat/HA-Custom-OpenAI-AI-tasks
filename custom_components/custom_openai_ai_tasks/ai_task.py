@@ -1,4 +1,4 @@
-"""Azure AI Task entity for Home Assistant."""
+"""Custom OpenAI AI Task entity for Home Assistant."""
 from __future__ import annotations
 
 import base64
@@ -55,7 +55,7 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up Azure AI Task entities from a config entry."""
+    """Set up Custom OpenAI AI Task entities from a config entry."""
     config = hass.data[DOMAIN][config_entry.entry_id]
     
     # Get chat model from options if available, otherwise use config data or defaults
@@ -66,16 +66,16 @@ async def async_setup_entry(
     image_model = (config_entry.options.get(CONF_IMAGE_MODEL) or 
                   config.get(CONF_IMAGE_MODEL, "")).strip()
     
-    _LOGGER.info("Setting up Azure AI Tasks entity with chat_model='%s', image_model='%s'", 
+    _LOGGER.info("Setting up Custom OpenAI AI Tasks entity with chat_model='%s', image_model='%s'", 
                  chat_model, image_model)
     
     # Ensure at least one model is configured
     if not chat_model and not image_model:
-        _LOGGER.error("No models configured for Azure AI Tasks integration")
+        _LOGGER.error("No models configured for Custom OpenAI AI Tasks integration")
         return
     
     async_add_entities([
-        AzureAITaskEntity(
+        CustomOpenAIEndpointAITaskEntity(
             config[CONF_NAME],
             config[CONF_ENDPOINT],
             config[CONF_API_KEY],
@@ -87,8 +87,8 @@ async def async_setup_entry(
     ])
 
 
-class AzureAITaskEntity(ai_task.AITaskEntity):
-    """Azure AI Task entity."""
+class CustomOpenAIEndpointAITaskEntity(ai_task.AITaskEntity):
+    """Custom OpenAI AI Task entity."""
 
     def __init__(
         self,
@@ -100,7 +100,7 @@ class AzureAITaskEntity(ai_task.AITaskEntity):
         hass: HomeAssistant,
         config_entry: ConfigEntry,
     ) -> None:
-        """Initialize the Azure AI Task entity."""
+        """Initialize the Custom OpenAI AI Task entity."""
         self._name = name
         self._endpoint = endpoint.rstrip("/")
         self._api_key = api_key
@@ -201,7 +201,7 @@ class AzureAITaskEntity(ai_task.AITaskEntity):
         elif status == 404:
             raise HomeAssistantError(f"Model '{model}' not found - check your deployment name")
         else:
-            raise HomeAssistantError(f"Azure AI API error: {status}")
+            raise HomeAssistantError(f"Custom OpenAI API error: {status}")
 
     def _extract_image_size(self, size_str: str) -> tuple[int, int]:
         """Extract width and height from size string like '1024x1024'."""
@@ -473,12 +473,14 @@ class AzureAITaskEntity(ai_task.AITaskEntity):
                     _LOGGER.warning("Failed to process attachment: %s", err)
             
             return {
+                "model": model,
                 "messages": [{"role": "user", "content": message_content}],
                 "max_tokens": MAX_TOKENS,
                 "temperature": DEFAULT_TEMPERATURE
             }
         else:
             return {
+                "model": model,
                 "messages": [{"role": "user", "content": user_message}],
                 "max_tokens": MAX_TOKENS,
                 "temperature": DEFAULT_TEMPERATURE
@@ -499,7 +501,7 @@ class AzureAITaskEntity(ai_task.AITaskEntity):
             _LOGGER.error("Failed to process image attachment for editing. Attachments: %r", attachments)
             raise HomeAssistantError("Failed to process image attachment for editing.")
 
-        url = f"{self._endpoint}/openai/deployments/{image_model}/images/edits"
+        url = f"{self._endpoint}/{image_model}/images/edits"
         headers = self._get_headers()
         payload = {
             "model": image_model,
@@ -517,7 +519,7 @@ class AzureAITaskEntity(ai_task.AITaskEntity):
         ) as response:
             if response.status != 200:
                 error_text = await response.text()
-                _LOGGER.error("Azure AI image edit error: %s (status=%s)", error_text, response.status)
+                _LOGGER.error("Custom OpenAI image edit error: %s (status=%s)", error_text, response.status)
                 self._handle_api_error(response.status, error_text, image_model)
             
             result = await response.json()
@@ -541,7 +543,7 @@ class AzureAITaskEntity(ai_task.AITaskEntity):
             "size": DEFAULT_IMAGE_SIZE,
             "response_format": "b64_json"
         }
-        url = f"{self._endpoint}/openai/deployments/{image_model}/images/generations"
+        url = f"{self._endpoint}/{image_model}/images/generations"
         
         async with session.post(
             url,
@@ -551,7 +553,7 @@ class AzureAITaskEntity(ai_task.AITaskEntity):
         ) as response:
             if response.status != 200:
                 error_text = await response.text()
-                _LOGGER.error("Azure AI image generation error: %s (status=%s)", error_text, response.status)
+                _LOGGER.error("Custom OpenAI image generation error: %s (status=%s)", error_text, response.status)
                 self._handle_api_error(response.status, error_text, image_model)
             
             result = await response.json()
@@ -600,8 +602,8 @@ class AzureAITaskEntity(ai_task.AITaskEntity):
             else:
                 raise HomeAssistantError(f"API error [{error_code}]: {error_message}")
         else:
-            _LOGGER.error("Unexpected response format from Azure AI: %s", result)
-            raise HomeAssistantError("Unexpected response format from Azure AI")
+            _LOGGER.error("Unexpected response format from Custom OpenAI AI: %s", result)
+            raise HomeAssistantError("Unexpected response format from Custom OpenAI AI")
         
         # Add to chat log
         chat_log.async_add_assistant_content_without_tools(
@@ -651,7 +653,7 @@ class AzureAITaskEntity(ai_task.AITaskEntity):
             "temperature": DEFAULT_TEMPERATURE,
             "model": image_model
         }
-        url = f"{self._endpoint}/openai/deployments/{image_model}/chat/completions"
+        url = f"{self._endpoint}/{image_model}/chat/completions"
         headers = self._get_headers()
         
         async with session.post(
@@ -662,7 +664,7 @@ class AzureAITaskEntity(ai_task.AITaskEntity):
         ) as response:
             if response.status != 200:
                 error_text = await response.text()
-                _LOGGER.error("Azure AI vision model error: %s", error_text)
+                _LOGGER.error("Custom OpenAI vision model error: %s", error_text)
                 self._handle_api_error(response.status, error_text, image_model)
             
             result = await response.json()
@@ -712,7 +714,7 @@ class AzureAITaskEntity(ai_task.AITaskEntity):
                 "quality": "standard",
             })
 
-        url = f"{self._endpoint}/openai/deployments/{image_model}/images/generations"
+        url = f"{self._endpoint}/{image_model}/images/generations"
         headers = self._get_headers()
         
         async with session.post(
@@ -723,7 +725,7 @@ class AzureAITaskEntity(ai_task.AITaskEntity):
         ) as response:
             if response.status != 200:
                 error_text = await response.text()
-                _LOGGER.error("Azure AI image generation error: %s", error_text)
+                _LOGGER.error("Custom OpenAI image generation error: %s", error_text)
                 self._handle_api_error(response.status, error_text, image_model)
             
             result = await response.json()
@@ -771,8 +773,8 @@ class AzureAITaskEntity(ai_task.AITaskEntity):
                 )
                 
         except aiohttp.ClientError as err:
-            _LOGGER.error("Error communicating with Azure AI: %s", err)
-            raise HomeAssistantError(f"Error communicating with Azure AI: {err}") from err
+            _LOGGER.error("Error communicating with Custom OpenAI AI: %s", err)
+            raise HomeAssistantError(f"Error communicating with Custom OpenAI AI: {err}") from err
 
     async def _async_generate_data(
         self,
@@ -813,14 +815,15 @@ class AzureAITaskEntity(ai_task.AITaskEntity):
 
         try:
             async with session.post(
-                f"{self._endpoint}/openai/deployments/{model_to_use}/chat/completions",
+                # ff"{self._endpoint}/openai/deployments/{model_to_use}/chat/completions",
+                f"{self._endpoint}/v1/chat/completions",
                 headers=headers,
                 json=payload,
                 params={"api-version": API_VERSION_CHAT}
             ) as response:
                 if response.status != 200:
                     error_text = await response.text()
-                    _LOGGER.error("Azure AI API error: %s", error_text)
+                    _LOGGER.error("Custom OpenAI AI API error: %s", error_text)
                     self._handle_api_error(response.status, error_text, model_to_use)
                     
                 result = await response.json()
@@ -840,12 +843,12 @@ class AzureAITaskEntity(ai_task.AITaskEntity):
                             data=text,
                         )
                 else:
-                    _LOGGER.error("Unexpected response format from Azure AI: %s", result)
-                    raise HomeAssistantError("Unexpected response format from Azure AI")
+                    _LOGGER.error("Unexpected response format from Custom OpenAI AI: %s", result)
+                    raise HomeAssistantError("Unexpected response format from Custom OpenAI AI")
                     
         except aiohttp.ClientError as err:
-            _LOGGER.error("Error communicating with Azure AI: %s", err)
-            raise HomeAssistantError(f"Error communicating with Azure AI: {err}") from err
+            _LOGGER.error("Error communicating with Custom OpenAI AI: %s", err)
+            raise HomeAssistantError(f"Error communicating with Custom OpenAI AI: {err}") from err
 
     def _build_structure_instructions(self, structure: Any) -> str:
         """Build clear instructions for the AI model based on the structure schema."""
@@ -1020,4 +1023,4 @@ class AzureAITaskEntity(ai_task.AITaskEntity):
                 err,
                 cleaned,
             )
-            raise HomeAssistantError("Error with Azure AI structured response") from err
+            raise HomeAssistantError("Error with Custom OpenAI AI structured response") from err

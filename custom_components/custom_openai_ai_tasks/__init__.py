@@ -1,4 +1,4 @@
-"""The Azure AI Tasks integration."""
+"""The Custom OpenAI AI Tasks integration."""
 from __future__ import annotations
 
 import logging
@@ -41,7 +41,7 @@ def _check_ha_version() -> None:
 
 async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Migrate old entry to new version."""
-    _LOGGER.info(f"Migrating Azure AI Tasks config entry {config_entry.entry_id} from version {config_entry.version} to version 2")
+    _LOGGER.info(f"Migrating Custom OpenAI AI Tasks config entry {config_entry.entry_id} from version {config_entry.version} to version 2")
     
     if config_entry.version == 1:
         new_data = dict(config_entry.data)
@@ -76,7 +76,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up Azure AI Tasks from a config entry."""
+    """Set up Custom OpenAI AI Tasks from a config entry."""
     # Check Home Assistant version compatibility
     _check_ha_version()
     
@@ -92,7 +92,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Update options."""
-    _LOGGER.info("Azure AI Tasks options updated for entry %s", entry.entry_id)
+    _LOGGER.info("Custom OpenAI AI Tasks options updated for entry %s", entry.entry_id)
     _LOGGER.info("New options: %s", entry.options)
     # Reload the integration when options change
     await hass.config_entries.async_reload(entry.entry_id)
